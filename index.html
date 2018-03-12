@@ -7,29 +7,36 @@
   <link rel="stylesheet" type="text/css" href="assets/css/reset.css">
   <link rel="stylesheet" type="text/css" href="assets/css/style.css">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-  <script
-  src="https://code.jquery.com/color/jquery.color-2.1.0.js"
-  integrity="sha256-Xjpy+9ekY336rkyjeSr/tG3CcJ4ylo5w4IXkV3SKEPY="
-  crossorigin="anonymous"></script>
+  <script src="https://code.jquery.com/color/jquery.color-2.1.0.js" integrity="sha256-Xjpy+9ekY336rkyjeSr/tG3CcJ4ylo5w4IXkV3SKEPY="
+    crossorigin="anonymous"></script>
 </head>
 
 <body>
   <script type="text/javascript">
     var utag_data = {
+      page_type: "home"
     }
   </script>
-      
+
   <!-- Loading script asynchronously -->
   <script type="text/javascript">
-    (function(a,b,c,d){
-    a='//tags.tiqcdn.com/utag/services-ben-martin/main/prod/utag.js';
-    b=document;c='script';d=b.createElement(c);d.src=a;d.type='text/java'+c;d.async=true;
-    a=b.getElementsByTagName(c)[0];a.parentNode.insertBefore(d,a);
+    (function (a, b, c, d) {
+      a = '//tags.tiqcdn.com/utag/services-ben-martin/main/prod/utag.js';
+      b = document;
+      c = 'script';
+      d = b.createElement(c);
+      d.src = a;
+      d.type = 'text/java' + c;
+      d.async = true;
+      a = b.getElementsByTagName(c)[0];
+      a.parentNode.insertBefore(d, a);
     })();
-  </script>  
+  </script>
   <header id="masthead">
     <div class="container">
-      <a href="index.html" id="logo"><marquee>Benjamin Martin</marquee></a>
+      <a href="index.html" id="logo">
+        <marquee>Benjamin Martin</marquee>
+      </a>
       <nav>
         <a href="index.html">About</a>
         <a href="portfolio.html">Portfolio</a>
@@ -45,9 +52,11 @@
       <img src="assets/images/rm.gif
       " class="auth-image" alt="Your Name">
 
-      <p>Marshmallow jelly souffl&eacute; pastry biscuit gummi bears tootsie roll tootsie roll gingerbread. Cotton candy muffin gingerbread fruitcake. Sweet roll souffl&eacute; topping wafer croissant oat cake gummi&nbsp;bears.</p>
+      <p>Marshmallow jelly souffl&eacute; pastry biscuit gummi bears tootsie roll tootsie roll gingerbread. Cotton candy muffin
+        gingerbread fruitcake. Sweet roll souffl&eacute; topping wafer croissant oat cake gummi&nbsp;bears.</p>
 
-      <p>Jelly-o cheesecake dessert fruitcake ice cream brownie liquorice souffl&eacute;. Caramels biscuit gummi bears tiramisu chupa chups. Croissant macaroon cotton candy cake pudding.</p>
+      <p>Jelly-o cheesecake dessert fruitcake ice cream brownie liquorice souffl&eacute;. Caramels biscuit gummi bears tiramisu
+        chupa chups. Croissant macaroon cotton candy cake pudding.</p>
 
     </section>
 
@@ -55,16 +64,23 @@
       <div id="connect">
         <h2>Connect with Me</h2>
 
-        <a href="http://github.com/benjaminalfred"><img src="assets/images/github.svg" class="social" alt="GitHub" /></a>
-        <a href="http://linkedin.com/in/benjaminalfred"><img src="assets/images/linkedin.svg" class="social" alt="LinkedIn" /></a>
-        <a href="https://stackoverflow.com/users/2817801/benjamin-martin"><img src="assets/images/stackoverflow.svg" class="social" alt="Stack Overflow" /></a>
+        <a href="http://github.com/benjaminalfred">
+          <img src="assets/images/github.svg" class="social" alt="GitHub" />
+        </a>
+        <a href="http://linkedin.com/in/benjaminalfred">
+          <img src="assets/images/linkedin.svg" class="social" alt="LinkedIn" onclick="console.log('hello from inside the link')"
+          />
+        </a>
+        <a href="https://stackoverflow.com/users/2817801/benjamin-martin">
+          <img src="assets/images/stackoverflow.svg" class="social" alt="Stack Overflow" />
+        </a>
       </div>
     </section>
   </div>
 
   <footer>
     <div class="container">
-      Copyright &copy; 
+      Copyright &copy;
     </div>
   </footer>
 </body>
