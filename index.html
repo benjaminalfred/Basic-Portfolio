@@ -11,6 +11,220 @@
     crossorigin="anonymous"></script>
 </head>
 
+<!-- START Libraries for Partner Referral Codes -->
+<script src="/js/public/jquery-latest.min.js" type="text/javascript"></script>
+<script src="/js/public/jquery.cookie.js" type="text/javascript"></script>
+<script src="/js/public/jQueryString-2.0.2-Min.js" type="text/javascript"></script> 
+<!-- END Libraries for Partner Referral Codes -->
+
+<!-- Partner Referral & pre-populate fields for tracking data for PPC -->
+<script type="text/javascript">
+  var is_partner_ref = false;
+  var is_utm_campaign = false;
+  (function($) {
+    function ref_init() {
+			if ($.QueryStringExist({ID: "referral"})){
+				var ref_qs = $.getQueryString({ID: "referral"});					
+				if ($.cookie('partner_referral')==undefined){
+					$.cookie('partner_referral', ref_qs, { expires: null, path: '/', domain: 'sageintacct.com', secure: false });
+				}
+				else{
+					//cookie already exists
+				}
+			is_partner_ref = true;
+			}
+			//get the utm_* values from the query string
+			if ($.QueryStringExist({ID: "utm_medium"})) {
+        $("#Ad_Medium__c").attr("value", $.getQueryString({ID: "utm_medium"}));
+      }
+			if ($.QueryStringExist({ID: "utm_campaign"})) {
+        $("#Ad_Campaign__c").attr("value", $.getQueryString({ID: "utm_campaign"}));
+				is_utm_campaign = true;
+      }
+			if ($.QueryStringExist({ID: "utm_content"})) {
+        $("#Ad_Description__c").attr("value", $.getQueryString({ID: "utm_content"}));
+      }
+			if ($.QueryStringExist({ID: "kw"})) {
+        $("#Ad_Keyword__c").attr("value", $.getQueryString({ID: "kw"}));
+      }
+      //var utm_source = $.QueryStringExist({ID: "utm_source"}) ? $.getQueryString({ID: "utm_source"}) : false;
+			//$("#Lead_Source__c").attr("value", utm_source);//Lead Source is covered later
+			//$("#MCode__c").attr("value", utm_medium + "-" + utm_source);//add utm_source to Mcode
+    }
+    $(document).ready(ref_init);
+  })(jQuery);
+</script>
+<!-- Partner Referral -->
+
+<script type="text/javascript">
+
+// Automatically select blank value for anonymous leads
+if (typeof mktoPreFillFields !== 'undefined' && !mktoPreFillFields.Email) {
+    // Add more boolean fields here that you wanted defaulted to not select any option
+    mktoPreFillFields.AICPA_Member_yn__c = null;
+}
+
+var $jQ = jQuery.noConflict();
+
+$jQ(document).ready(function() {
+
+     //-----
+    //------------- CHANGE THESE!!! --------------------
+    //-----
+
+    // Change this to match domains of referrers you want to ignore.
+    // You'll want to ignore referrers from your own domains.
+    // Use only the base domain name without subdomains (ex. "company.com")
+    // Separate multiple domains with commas (leave the brackets).
+    var excludedReferrers = [ "sageintacct.com" ];
+
+    // Change this to match the base domain of your company's landing pages.
+    // Cookies will be created with this domain.
+    // Ex. If your landing page domain is "pages.yourcompany.com" then use
+    //     "yourcompany.com"
+    var cookieDomain = "sageintacct.com";
+
+     // The URL parameter that has your pay-per-click info.
+     // Typically "kw" or "keyword" (depends on how you set up your PPC URLs)
+    var payPerClickParameter = "kw";//rvp 8/26/2013 - this was "keyword" hence the mis-match & null value
+
+
+     // IDs for the fields to be updated.
+    var searchStringField = "#Search_String__c";
+    var searchEngineField = "#Search_Engine__c";
+    var payPerClickKeywordField = "#Pay_Per_Click_Keyword__c";
+
+    //-----
+    //----- you probably shouldn't change anything after this -----
+    //-----
+
+
+    var refer = document.referrer;
+    var searchString = false;
+    var searchEngine = false;
+
+    // if there's no referrer, do nothing
+    if (typeof refer !== 'undefined' && refer !== "") {
+
+      // get the domain of the referring website -- http://[[this-thing.com]]/
+      var referrerDomain =
+        refer.substr(refer.indexOf("\/\/") + 2,
+          refer.indexOf("\/",8) - refer.indexOf("\/\/") - 2).toLowerCase();
+
+      var excludedDomainFound = false;
+      var i = 0;
+
+      // search the excluded domain list to see if the referrer domain is on it
+      while ( (i < excludedReferrers.length) && !excludedDomainFound) {
+        var thisExcludedDomain = excludedReferrers[i].toLowerCase();
+
+        // weird semantics here -- indexOf returns "-1" if the search string isnt found.
+        // thus excludedDomainFound is true only when indexOf matches an excluded domain (!= -1)
+        excludedDomainFound = (referrerDomain.indexOf(thisExcludedDomain) != -1);
+        i++;
+      }
+
+      // only if the referrer isn't in our excluded domain list...
+      if( !excludedDomainFound ) {
+
+        // extract the URL parameters from common search engines
+        // To add your own, each engine needs a:
+        //    name: how the search engine will appear on your Marketo leads
+        //    url: REGEX for matching the engine's referrer.  ex.  /\.google\./i
+        //    query: URL parameter that contains the search query - usually "p" or "q"
+
+        var searchEngines = [
+          { name: "Yahoo", url: /\.yahoo\.co/i, query: "p" },
+          { name: "Google", url: /\.google\./i, query: "q" },
+          //{ name: "Microsoft Live", url: /\.live\.com/i, query: "q" },
+          //{ name: "MSN Search", url: /search\.msn\./i, query: "q" },
+          { name: "AOL", url: /\.aol\./i, query: "query" },
+          { name: "Bing", url: /\.bing\.com/i, query: "pq" },
+          { name: "Ask", url: /\.ask\.com/i, query: "q" }
+        ];
+
+        // find the referring search engine (if any)
+        i = 0;
+        while (i < searchEngines.length) {
+          if (refer.match(searchEngines[i].url)) {
+            searchEngine = searchEngines[i].name;
+            searchString = $jQ.getQueryString({ ID: searchEngines[i].query, URL: refer, DefaultValue: "" });
+            break;
+          }
+          i++;
+        }
+
+        // If no search engine is found, this person probably used a less
+        // popular one.  Use the referring doman, then guess the query parameter
+        if (i == searchEngines.length) {
+
+          searchEngine = referrerDomain;
+
+          var queries = ["q","p","pq","query"];
+          var i = 0;
+          while ((i < queries.length) && (searchString == undefined)) {
+            searchString = $jQ.getQueryString({ ID: queries[i], URL: refer });
+            i++;
+          }
+
+          // no search strings found -- use this text instead.
+          if (searchString == undefined) {
+            searchString = "None";
+          }
+        }
+
+        // Use the provided URL parameter to get the PPC keyword.
+        var payPerClickWord =
+          $jQ.getQueryString({ID: payPerClickParameter, URL: refer, DefaultValue: "" });
+
+        // Put the info into cookies.  These values will be extracted
+        // and put into a Marketo form later.
+        $jQ.cookie('mktoPPCKeyword', payPerClickWord,
+                   {expires: 1, path: '\/', domain: cookieDomain});
+        $jQ.cookie('mktoSearchEngine', searchEngine,
+                   {expires: 1, path: '\/', domain: cookieDomain});
+        $jQ.cookie('mktoSearchString', searchString,
+                   {expires: 1, path: '\/', domain: cookieDomain});
+      } // if( !excludedDomainFound )
+    } // if (typeof refer !== 'undefined')
+
+    var mktoSearchStringVal = false;
+    var mktoSearchEngineVal = false;
+    var mktoPPCKeyword = false;
+    var mktoEmailToken = $jQ.getQueryString({ID: "mkt_tok", URL: window.location.href});
+
+    if (typeof mktoEmailToken === 'undefined') {//not an email
+      mktoSearchStringVal = $jQ.cookie('mktoSearchString');
+      mktoSearchEngineVal = $jQ.cookie('mktoSearchEngine');
+      mktoPPCKeyword = $jQ.cookie('mktoPPCKeyword');
+      //$jQ("#Ad_Keyword__c").attr("value", mktoPPCKeyword);//we already added the keyword earlier
+    }
+
+
+    //If User is cookied and "Contact Me" is checked, change value to "Phone" instead of the default "1"
+    if ($jQ("#Best_Contact_Method__c").attr("checked") == true) {
+      $jQ("#Best_Contact_Method__c").attr("value","Phone");
+    } else {
+      $jQ("#Best_Contact_Method__c").attr("value","");
+    }          
+                
+    //what to do when the user changes the contact me immediately checkbox
+    $jQ("#Best_Contact_Method__c").change( function() {
+      if ($jQ("#Best_Contact_Method__c").attr("checked") == true) {
+        $jQ("#Best_Contact_Method__c").attr("value","Phone");
+      } else {
+        $jQ("#Best_Contact_Method__c").attr("value","");
+      }
+    });
+
+});
+
+//END READY BLOCK
+
+</script>
+
+<!-- End Partner Referral -->
+
 <body>
   <script type="text/javascript">
     var utag_data = {
